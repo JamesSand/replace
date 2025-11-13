@@ -31,7 +31,7 @@ for i in "${!alphas[@]}"; do
             --hf_dataset HuggingFaceH4/math-500 \
             --limit 500 \
             --gpu_mem_util 0.7 \
-            --dtype fp32 \
+            --dtype float32 \
             --n_samples $n_samples \
             --max_tokens $max_tokens \
             --out_json ${model_name}_results.json \
