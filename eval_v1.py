@@ -30,20 +30,13 @@ from math_dapo import compute_score
 
 instruction = "Let's think step by step and output the final answer within \\boxed{}."
 
-def load_math500(hf_dataset: Optional[str],
-                 data_path: Optional[str],
-                 limit: Optional[int]) -> List[Dict[str, Any]]:
+def load_math_testset(
+                 data_path: Optional[str]):
+    
     items: List[Dict[str, Any]] = []
-    if data_path:
-        with open(data_path, "r", encoding="utf-8") as f:
-            for line in f:
-                obj = json.loads(line)
-                if "problem" in obj and "answer" in obj:
-                    items.append({"problem": obj["problem"], "answer": obj["answer"]})
-    else:
-        if not hf_dataset:
-            hf_dataset = "HuggingFaceH4/math-500"
-        ds = load_dataset(hf_dataset, split="test")
+    
+    if data_path == "HuggingFaceH4/math-500":
+        ds = load_dataset(data_path, split="test")
         for ex in ds:
             p = ex.get("problem")
             a = ex.get("answer")
@@ -51,12 +44,34 @@ def load_math500(hf_dataset: Optional[str],
                 items.append({"problem": p, "answer": a})
             else:
                 raise RuntimeError("Dataset examples must have 'problem' and 'answer' fields.")
-
-    if limit is not None and limit > 0:
-        items = items[:limit]
-
-    if not items:
-        raise RuntimeError("No data loaded. Check --hf_dataset/--data_path.")
+    elif data_path == "HuggingFaceH4/aime_2024":
+        ds = load_dataset(data_path, split="train")
+        for ex in ds:
+            p = ex.get("problem")
+            a = ex.get("answer")
+            if p is not None and a is not None:
+                items.append({"problem": p, "answer": a})
+            else:
+                raise RuntimeError("Dataset examples must have 'problem' and 'answer' fields.")
+    elif data_path == "math-ai/aime25":
+        ds = load_dataset(data_path, split="test")
+        for ex in ds:
+            p = ex.get("problem")
+            a = ex.get("answer")
+            if p is not None and a is not None:
+                items.append({"problem": p, "answer": a})
+            else:
+                raise RuntimeError("Dataset examples must have 'problem' and 'answer' fields.")
+    elif data_path == "math-ai/amc23":
+        ds = load_dataset(data_path, split="test")
+        for ex in ds:
+            p = ex.get("question")
+            a = ex.get("answer")
+            if p is not None and a is not None:
+                items.append({"problem": p, "answer": a})
+            else:
+                raise RuntimeError("Dataset examples must have 'problem' and 'answer' fields.")
+    
     return items
 
 def build_prompts(items: List[Dict[str, Any]]) -> List[str]:
@@ -170,19 +185,40 @@ def save_json(results: List[Dict[str, Any]], path: str):
     payload = {"summary": summary, "results": results}
     with open(path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
+        
+def test_dataset_loading():
+    
+    data_path_list = [
+        "HuggingFaceH4/math-500",
+        "HuggingFaceH4/aime_2024",
+        "math-ai/aime25",
+        "math-ai/amc23",
+    ]
+
+
+    for data_path in data_path_list:
+        
+        items = load_math_testset(data_path)
+        print(f"Loaded {len(items)} items from {data_path} for testing.")
+
+# print("=" * 50)
+
+# test_dataset_loading()
+# breakpoint()
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", type=str, required=True, help="HF model id/local path")
-    ap.add_argument("--hf_dataset", type=str, default="HuggingFaceH4/math-500",
-                    help="HF dataset with fields: problem, answer")
-    ap.add_argument("--data_path", type=str, default=None,
-                    help="Optional local JSONL (problem/answer). If provided, overrides --hf_dataset.")
-    ap.add_argument("--limit", type=int, default=500, help="Number of problems to evaluate (<=500)")
+    ap.add_argument("--data_path", type=str, default=None, choices=[
+        "HuggingFaceH4/math-500",
+        "HuggingFaceH4/aime_2024",
+        "math-ai/aime25",
+        "math-ai/amc23",
+    ])
     ap.add_argument("--n_samples", type=int, default=4, help="Samples per problem")
     ap.add_argument("--max_tokens", type=int, default=int(4 * 1024))
-    ap.add_argument("--temperature", type=float, default=0.7)
-    ap.add_argument("--top_p", type=float, default=0.9)
+    ap.add_argument("--temperature", type=float, default=1.0)
+    ap.add_argument("--top_p", type=float, default=0.8)
     ap.add_argument("--tensor_parallel_size", type=int, default=1)
     ap.add_argument("--dtype", type=str, default=None, help="bfloat16/float16/float32, etc.")
     ap.add_argument("--trust_remote_code", action="store_true", default=True)
@@ -195,11 +231,9 @@ def main():
     if args.out_json is None:
         output_folder = "outputs"
         os.makedirs(output_folder, exist_ok=True)
-        args.out_json = os.path.join(output_folder, f"{args.model.replace('/', '_')}_math500_results.json")
+        args.out_json = os.path.join(output_folder, f"{args.model.replace('/', '_')}_math_testset_results.json")
 
-    items = load_math500(None if not args.data_path else args.hf_dataset,
-                         args.data_path,
-                         args.limit)
+    items = load_math_testset(args.data_path)
 
     common = dict(
         items=items,
