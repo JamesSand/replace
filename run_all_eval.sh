@@ -2,15 +2,17 @@
 
 set -e
 
+# this will lead to OOM
+
 base_dir="DeepScaleR-1.5B-Preview_sigma-blend_fp32"
 alphas=(0.0 0.2 0.4 0.6 0.8 1.0)
 # alphas=(0.8 1.0)
 # gpus=(0 1)
-gpus=(0 1 2 3 4 5 6 7) 
+gpus=(6 7) 
 num_gpus=${#gpus[@]}
 max_tokens=$((6*1024))
 n_samples=16
-tokenizer="agentica-org/DeepScaleR-1.5B-Preview"  # 使用原始模型的 tokenizer
+tokenizer="agentica-org/DeepScaleR-1.5B-Preview"  # 用原始模型的 tokenizer
 
 mkdir -p logs
 
@@ -31,6 +33,7 @@ for i in "${!alphas[@]}"; do
             --hf_dataset HuggingFaceH4/math-500 \
             --limit 500 \
             --gpu_mem_util 0.7 \
+            --dtype float32 \
             --n_samples $n_samples \
             --max_tokens $max_tokens \
             --out_json ${model_name}_results.json \
