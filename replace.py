@@ -12,11 +12,17 @@ import torch
 from transformers import AutoModelForCausalLM
 
 # ===================== 可配置区 =====================
-MODEL_BEFORE = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"     # before RL
-# MODEL_AFTER  = "agentica-org/DeepScaleR-1.5B-Preview"          # after  RL
-# BASE_OUTPUT_DIR = "DeepScaleR-1.5B-Preview_sigma-blend_fp32"   # 根输出目录
+# MODEL_BEFORE = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"     # before RL
+# # MODEL_AFTER  = "agentica-org/DeepScaleR-1.5B-Preview"          # after  RL
+# # BASE_OUTPUT_DIR = "DeepScaleR-1.5B-Preview_sigma-blend_fp32"   # 根输出目录
 
-MODEL_AFTER = "nvidia/Nemotron-Research-Reasoning-Qwen-1.5B"
+# MODEL_AFTER = "nvidia/Nemotron-Research-Reasoning-Qwen-1.5B"
+
+
+MODEL_BEFORE = "Qwen/Qwen2.5-Math-1.5B"
+MODEL_AFTER = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+
+
 BASE_OUTPUT_DIR = "Nemotron-Research-Reasoning-Qwen-1.5B_sigma-blend_fp32"
 
 
