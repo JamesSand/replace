@@ -12,6 +12,26 @@ run_svd_decompose.sh （批量做 SVD 分解）
 svd_compare.py
 ```
 
+## 现在的结果
+
+现在用的是这三个models
+
+RL 的顺序是： base → rl1 → rl2
+
+```
+MODEL_IDS=(
+  "Qwen/Qwen2.5-VL-3B-Instruct" # base
+  "IffYuan/Embodied-R1-3B-Stage1" # rl1
+  "IffYuan/Embodied-R1-3B-v1" # rl2
+)
+```
+
+vision part 的结果
+[](./rotation_mse_curves_vision.png)
+
+language part 的结果
+[](./rotation_mse_curves_language.png)
+
 
 ## 使用流程
 
