@@ -10,6 +10,9 @@ outputs/
 gen_results/
 
 logs/
+logs_backup/
+
+qwenvl-svd
 
 DeepScaleR-1.5B-Preview_sigma-blend_fp32
 

@@ -16,13 +16,13 @@ from transformers import AutoModelForCausalLM
 # # MODEL_AFTER  = "agentica-org/DeepScaleR-1.5B-Preview"          # after  RL
 # # BASE_OUTPUT_DIR = "DeepScaleR-1.5B-Preview_sigma-blend_fp32"   # 根输出目录
 
-MODEL_BEFORE = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B" 
-MODEL_AFTER = "nvidia/Nemotron-Research-Reasoning-Qwen-1.5B"
-BASE_OUTPUT_DIR = "Nemotron-Research-Reasoning-Qwen-1.5B_sigma-blend_fp32"
+# MODEL_BEFORE = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B" 
+# MODEL_AFTER = "nvidia/Nemotron-Research-Reasoning-Qwen-1.5B"
+# BASE_OUTPUT_DIR = "Nemotron-Research-Reasoning-Qwen-1.5B_sigma-blend_fp32"
 
-# MODEL_BEFORE = "Qwen/Qwen2.5-Math-1.5B"
-# MODEL_AFTER = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
-# BASE_OUTPUT_DIR = "DeepSeek-R1-Distill-Qwen-1.5B_sigma-blend_fp32"
+MODEL_BEFORE = "Qwen/Qwen2.5-Math-1.5B"
+MODEL_AFTER = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+BASE_OUTPUT_DIR = "DeepSeek-R1-Distill-Qwen-1.5B_sigma-blend_fp32"
 
 BASE_LOG_DIR    = "svd_logs"                                   # 根日志目录
 ALPHAS = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]                        # 要遍历的 alpha
