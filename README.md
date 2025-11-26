@@ -27,10 +27,10 @@ MODEL_IDS=(
 ```
 
 vision part 的结果
-[](./rotation_mse_curves_vision.png)
+![](./rotation_mse_curves_vision.png)
 
 language part 的结果
-[](./rotation_mse_curves_language.png)
+![](./rotation_mse_curves_language.png)
 
 
 ## 使用流程
