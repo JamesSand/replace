@@ -278,6 +278,7 @@ if __name__ == "__main__":
     print("PART 2: Cross-Layer Analysis")
     print("=" * 80)
     
+    # for vision parts
     layer_start = 0
     layer_end = 32  
     
@@ -314,6 +315,8 @@ if __name__ == "__main__":
     
     plot_layer_mse_curves(layer_configs, output_path=output_path)
     
+    
+    # for language parts
     layer_start = 0
     layer_end = 5  # 分析前10层
     
