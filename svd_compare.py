@@ -313,12 +313,12 @@ if __name__ == "__main__":
         # 如果需要分析 language 层，取消下面的注释
     ]
     
-    plot_layer_mse_curves(layer_configs, output_path=output_path)
+    # plot_layer_mse_curves(layer_configs, output_path=output_path)
     
     
     # for language parts
     layer_start = 0
-    layer_end = 5  # 分析前10层
+    layer_end = 12  # 分析前10层
     
     output_path = "rotation_mse_curves_language.png"
     
