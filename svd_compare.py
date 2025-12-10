@@ -115,7 +115,15 @@ def compute_layer_mse(LAYER_NAME: str, verbose=True):
     R1_U = U_base.T @ U_rl1
     R2_U = U_rl1.T @ U_rl2
     R3_U = U_base.T @ U_rl2
-    R4_U = R1_U @ R2_U
+    R4_U = R1_U @ R2_U 
+    
+    # R3 = U_base.T @ U_rl2
+    
+    # R4 = (U_base^T @ U_rl1) @ (U_rl1^T @ U_rl2) 
+    #    = U_base^T @ (U_rl1 @ U_rl1.T) @ U_rl2 
+    
+    # U: shape (3840, 1280)
+    # (U_rl1 @ U_rl1.T) shape (3840, 3840), which only first 1280 diagno entry is 1, rest all 0.
     
     # === Vh 矩阵的旋转分析 ===
     R1_Vh = Vh_base @ Vh_rl1.T
@@ -123,11 +131,21 @@ def compute_layer_mse(LAYER_NAME: str, verbose=True):
     R3_Vh = Vh_base @ Vh_rl2.T
     R4_Vh = R1_Vh @ R2_Vh
     
+    verbose = True
+    
     if verbose:
         print("U matrix shape", tuple(U_base.shape))
         print(f"U Rotation matrix shape: {tuple(R1_U.shape)}")
         print("Vh matrix shape", tuple(Vh_base.shape))
         print(f"Vh Rotation matrix shape: {tuple(R1_Vh.shape)}")
+        
+        x = U_rl1 @ U_rl1.T
+        print(x.shape)
+        
+        # save the matrix x
+        torch.save(x, "debug_U_rl1_U_rl1T.pt")
+        
+        breakpoint()
 
     # 计算 MSE
     rotation_mse_U = mse(R4_U, R3_U)
@@ -193,14 +211,21 @@ def plot_layer_mse_curves(layer_configs, output_path="rotation_mse_curves.png"):
         
         for i in layer_range:
             layer_name = name_template.format(i)
-            try:
-                mse_U, mse_Vh = compute_layer_mse(layer_name, verbose=False)
-                mse_U_list.append(mse_U)
-                mse_Vh_list.append(mse_Vh)
-                layer_indices.append(i)
-                print(f"Processed {layer_name}: U={mse_U:.6e}, Vh={mse_Vh:.6e}")
-            except Exception as e:
-                print(f"Skipped {layer_name}: {e}")
+            
+            mse_U, mse_Vh = compute_layer_mse(layer_name, verbose=False)
+            mse_U_list.append(mse_U)
+            mse_Vh_list.append(mse_Vh)
+            layer_indices.append(i)
+            print(f"Processed {layer_name}: U={mse_U:.6e}, Vh={mse_Vh:.6e}")
+            
+            # try:
+            #     mse_U, mse_Vh = compute_layer_mse(layer_name, verbose=False)
+            #     mse_U_list.append(mse_U)
+            #     mse_Vh_list.append(mse_Vh)
+            #     layer_indices.append(i)
+            #     print(f"Processed {layer_name}: U={mse_U:.6e}, Vh={mse_Vh:.6e}")
+            # except Exception as e:
+            #     print(f"Skipped {layer_name}: {e}")
         
         # 绘制 U 矩阵 MSE
         ax1.plot(layer_indices, mse_U_list, marker='o', label=label, linewidth=2, markersize=6)
