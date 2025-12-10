@@ -2,7 +2,14 @@
 
 set -e
 
+# evaluation command for me to copy paste
+# bash run_single_model.sh agentica-org/DeepScaleR-1.5B-Preview
+# bash run_single_model.sh agentica-org/DeepCoder-1.5B-Preview
+
 model_path="deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+
+# change model path to the first input parameter if provided
+model_path=${1:-$model_path}
 
 # alphas=(0.8 1.0)
 gpus=(0 1 2 3)
@@ -14,6 +21,12 @@ tokenizer=$model_path  # 用原始模型的 tokenizer
 # tokenizer_basename=$(basename $tokenizer)
 
 dataset_list=("HuggingFaceH4/aime_2024" "math-ai/amc23" "HuggingFaceH4/math-500")
+
+# echo model path and dataset list before running, sleep for 5 seconds to allow user to cancel
+echo "Model path: $model_path"
+echo "Datasets: ${dataset_list[@]}"
+echo "Starting evaluations in 5 seconds..."
+sleep 5
 
 mkdir -p logs
 mkdir -p gen_results
