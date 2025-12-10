@@ -2,14 +2,6 @@
 
 set -e
 
-# this will lead to OOM
-
-# base_dir="DeepScaleR-1.5B-Preview_sigma-blend_fp32"
-
-# base_dir="Nemotron-Research-Reasoning-Qwen-1.5B_sigma-blend_fp32"
-
-# alphas=(0.0 0.2 0.4 0.6 0.8 1.0)
-
 model_path="deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
 
 # alphas=(0.8 1.0)
@@ -24,6 +16,7 @@ tokenizer=$model_path  # 用原始模型的 tokenizer
 dataset_list=("HuggingFaceH4/aime_2024" "math-ai/amc23" "HuggingFaceH4/math-500")
 
 mkdir -p logs
+mkdir -p gen_results
 
 # Run evaluations on GPUs in parallel
 for i in "${!dataset_list[@]}"; do
