@@ -89,13 +89,7 @@ def mse(a: torch.Tensor, b: torch.Tensor) -> float:
 # 主逻辑
 # ==========================
 
-verbose = False
 debug = False
-random_projection = False
-optimal_projection = False
-optimal_projection_base = True
-
-
 
 def compute_layer_mse(LAYER_NAME: str, verbose=True):
     """
@@ -120,29 +114,7 @@ def compute_layer_mse(LAYER_NAME: str, verbose=True):
     U_base, Vh_base = data_base["U"], data_base["Vh"]
     U_rl1, Vh_rl1   = data_rl1["U"], data_rl1["Vh"]
     U_rl2, Vh_rl2   = data_rl2["U"], data_rl2["Vh"]
-    
-    if random_projection:
-        # change U_rl1, and Vh_rl1 into random orthogonal matrix with same shape
-        # For U_rl1: shape (m, r), generate random orthogonal columns
-        m, r = U_rl1.shape
-        random_matrix = torch.randn(m, r, dtype=U_rl1.dtype)
-        U_rl1, _ = torch.linalg.qr(random_matrix)  # QR decomposition gives orthogonal Q
-        
-        # For Vh_rl1: shape (r, n), generate random orthogonal rows
-        r, n = Vh_rl1.shape
-        random_matrix = torch.randn(r, n, dtype=Vh_rl1.dtype)
-        Vh_rl1, _ = torch.linalg.qr(random_matrix.T)  # QR on transpose, then transpose back
-        Vh_rl1 = Vh_rl1.T
-        
-    if optimal_projection:
-        # use optimal projection matrix, where this should be U_rl2
-        U_rl1 = U_rl2
-        Vh_rl1 = Vh_rl2
-        
-    if optimal_projection_base:
-        U_rl1 = U_base
-        Vh_rl1 = Vh_base
-    
+
     # === U 矩阵的旋转分析 ===
     R1_U = U_base.T @ U_rl1
     R2_U = U_rl1.T @ U_rl2
@@ -162,6 +134,8 @@ def compute_layer_mse(LAYER_NAME: str, verbose=True):
     R2_Vh = Vh_rl1 @ Vh_rl2.T
     R3_Vh = Vh_base @ Vh_rl2.T
     R4_Vh = R1_Vh @ R2_Vh
+    
+    verbose = True
     
     if verbose:
         print("U matrix shape", tuple(U_base.shape))
@@ -339,15 +313,6 @@ if __name__ == "__main__":
     
     output_path = "rotation_mse_curves_vision.png"
     
-    if random_projection:
-        output_path = f"random_projection_{output_path}"
-        
-    if optimal_projection:
-        output_path = f"optimal_projection_{output_path}"
-        
-    if optimal_projection_base:
-        output_path = f"optimal_projection_base_{output_path}"
-    
     layer_configs = [
         {
             'name': 'visual.blocks.{}.attn.qkv.weight',
@@ -385,15 +350,6 @@ if __name__ == "__main__":
     layer_end = 32
     
     output_path = "rotation_mse_curves_language.png"
-    
-    if random_projection:
-        output_path = f"random_projection_{output_path}"
-        
-    if optimal_projection:
-        output_path = f"optimal_projection_{output_path}"
-        
-    if optimal_projection_base:
-        output_path = f"optimal_projection_base_{output_path}"
     
     layer_configs = [
         {
