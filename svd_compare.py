@@ -243,21 +243,21 @@ def plot_layer_mse_curves(layer_configs, output_path="rotation_mse_curves.png"):
 
 if __name__ == "__main__":
     
-    # ===== 1. 分析单个模块的所有层（计算模块均值）=====
-    print("\n")
-    print("=" * 80)
-    print("PART 1: Module-wise Analysis (Layer 0 Only)")
-    print("=" * 80)
+    # # ===== 1. 分析单个模块的所有层（计算模块均值）=====
+    # print("\n")
+    # print("=" * 80)
+    # print("PART 1: Module-wise Analysis (Layer 0 Only)")
+    # print("=" * 80)
     
-    vision_layer_list = [
-        "visual.blocks.0.attn.qkv.weight",
-        "visual.blocks.0.attn.proj.weight",
-        "visual.blocks.0.mlp.gate_proj.weight",
-        "visual.blocks.0.mlp.up_proj.weight",
-        "visual.blocks.0.mlp.down_proj.weight",
-    ]
+    # vision_layer_list = [
+    #     "visual.blocks.0.attn.qkv.weight",
+    #     "visual.blocks.0.attn.proj.weight",
+    #     "visual.blocks.0.mlp.gate_proj.weight",
+    #     "visual.blocks.0.mlp.up_proj.weight",
+    #     "visual.blocks.0.mlp.down_proj.weight",
+    # ]
     
-    analyze_module_layers(vision_layer_list, module_name="Vision Module (Layer 0)")
+    # analyze_module_layers(vision_layer_list, module_name="Vision Module (Layer 0)")
     
     # language_layer_list = [
     #     "model.layers.0.self_attn.q_proj.weight",
@@ -313,12 +313,12 @@ if __name__ == "__main__":
         # 如果需要分析 language 层，取消下面的注释
     ]
     
-    # plot_layer_mse_curves(layer_configs, output_path=output_path)
+    plot_layer_mse_curves(layer_configs, output_path=output_path)
     
     
     # for language parts
     layer_start = 0
-    layer_end = 12  # 分析前10层
+    layer_end = 32
     
     output_path = "rotation_mse_curves_language.png"
     
