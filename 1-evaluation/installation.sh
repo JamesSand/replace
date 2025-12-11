@@ -34,3 +34,7 @@ wget -nv https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/f
 pip install --no-cache-dir flash_attn-2.7.4.post1+cu12torch2.6cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
 
 
+# install lighteval
+pip install "lighteval @ git+https://github.com/huggingface/lighteval.git@d3da6b9bbf38104c8b5e1acc86f83541f9a502d1"
+
+
