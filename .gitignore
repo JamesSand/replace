@@ -4,6 +4,8 @@ __pycache__/
 **/*.whl
 **/.claude
 
+**/.litellm_cache
+
 backupfiles/
 
 1-evaluation/open-r1
