@@ -10,7 +10,11 @@ set -e
 
 export PYTHONUNBUFFERED=1
 export VLLM_WORKER_MULTIPROC_METHOD=spawn # Required for vLLM
-MODEL=deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+
+# change model name to first input param
+MODEL=${1:-deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B}
+model_basename=$(basename $MODEL)
+# MODEL=deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
 MODEL_ARGS="model_name=$MODEL,dtype=bfloat16,max_model_length=32768,gpu_memory_utilization=0.8,generation_parameters={max_new_tokens:32768,temperature:0.6,top_p:0.95}"
 OUTPUT_DIR=data/evals/$MODEL
 LOG_DIR=logs
@@ -32,7 +36,7 @@ mkdir -p $OUTPUT_DIR
     lighteval vllm $MODEL_ARGS "lighteval|aime24|0|0" \
         --use-chat-template \
         --output-dir $OUTPUT_DIR \
-        2>&1 | tee $LOG_DIR/aime24_${timestamp}.log
+        2>&1 | tee $LOG_DIR/${model_basename}_aime24.log
 ) &
 
 # MATH-500
@@ -43,7 +47,7 @@ mkdir -p $OUTPUT_DIR
     lighteval vllm $MODEL_ARGS "lighteval|math_500|0|0" \
         --use-chat-template \
         --output-dir $OUTPUT_DIR \
-        2>&1 | tee $LOG_DIR/math_500_${timestamp}.log
+        2>&1 | tee $LOG_DIR/${model_basename}_math_500.log
 ) &
 
 # GPQA Diamond
@@ -54,7 +58,7 @@ mkdir -p $OUTPUT_DIR
     lighteval vllm $MODEL_ARGS "lighteval|gpqa:diamond|0|0" \
         --use-chat-template \
         --output-dir $OUTPUT_DIR \
-        2>&1 | tee $LOG_DIR/gpqa_diamond_${timestamp}.log
+        2>&1 | tee $LOG_DIR/${model_basename}_gpqa_diamond.log
 ) &
 
 # LiveCodeBench
@@ -65,7 +69,7 @@ mkdir -p $OUTPUT_DIR
     lighteval vllm $MODEL_ARGS "extended|lcb:codegeneration|0|0" \
         --use-chat-template \
         --output-dir $OUTPUT_DIR \
-        2>&1 | tee $LOG_DIR/lcb_codegeneration_${timestamp}.log
+        2>&1 | tee $LOG_DIR/${model_basename}_lcb_codegeneration.log
 ) &
 
 wait
