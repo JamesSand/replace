@@ -15,7 +15,7 @@ import argparse
 from typing import Dict, Any, Tuple
 
 import torch
-# from transformers import AutoModel
+from transformers import AutoModel
 from transformers import Qwen2_5_VLForConditionalGeneration, AutoTokenizer, AutoProcessor
 
 
@@ -53,15 +53,41 @@ def run_svd_on_param(weight: torch.Tensor) -> Dict[str, Any]:
 def process_model(model_id: str, output_dir: str):
     print(f"\n=== Processing model: {model_id} ===")
     os.makedirs(output_dir, exist_ok=True)
+    
+    qwen_vl_model_list = [
+        "Qwen/Qwen2.5-VL-3B-Instruct",
+        "IffYuan/Embodied-R1-3B-Stage1",
+        "IffYuan/Embodied-R1-3B-v1"
+    ]
 
-    # 默认加载到 CPU，避免显存爆炸；权重用 fp16 存，SVD 时再转 fp32
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-        model_id,
-        trust_remote_code=True,
-        torch_dtype="auto",
-        device_map="cpu",
-    )
-    model.eval()
+    if model_id in qwen_vl_model_list:
+        
+        print("=" * 50)
+        print("loading Qwen2.5-VL")
+        print("=" * 50)
+
+        # 默认加载到 CPU，避免显存爆炸；权重用 fp16 存，SVD 时再转 fp32
+        model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+            model_id,
+            trust_remote_code=True,
+            torch_dtype="auto",
+            device_map="cpu",
+        )
+        model.eval()
+        
+    else:
+        
+        print("=" * 50)
+        print("loading AutoModel")
+        print("=" * 50)
+        
+        model = AutoModel.from_pretrained(
+            model_id,
+            trust_remote_code=True,
+            torch_dtype="auto",
+            device_map="cpu",
+        )
+        model.eval()
 
     with torch.no_grad():
         for name, param in model.named_parameters():

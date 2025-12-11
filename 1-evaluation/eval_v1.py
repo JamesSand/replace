@@ -195,16 +195,11 @@ def test_dataset_loading():
         "math-ai/amc23",
     ]
 
-
     for data_path in data_path_list:
         
         items = load_math_testset(data_path)
         print(f"Loaded {len(items)} items from {data_path} for testing.")
 
-# print("=" * 50)
-
-# test_dataset_loading()
-# breakpoint()
 
 def main():
     ap = argparse.ArgumentParser()
