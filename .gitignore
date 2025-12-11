@@ -1,7 +1,12 @@
 
 __pycache__/
 
+**/*.whl
+**/.claude
+
 backupfiles/
+
+1-evaluation/open-r1
 
 *.json
 

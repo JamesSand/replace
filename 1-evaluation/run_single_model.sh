@@ -13,7 +13,6 @@ model_path=${1:-$model_path}
 
 # alphas=(0.8 1.0)
 gpus=(0 1 2 3)
-# gpus=(6 7) 
 num_gpus=${#gpus[@]}
 max_tokens=$((16*1024))
 n_samples=16
