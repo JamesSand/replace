@@ -24,8 +24,7 @@ mkdir -p $OUTPUT_DIR
     export CUDA_VISIBLE_DEVICES=${gpus[0]}
     timestamp=$(date +%Y%m%d_%H%M%S)
     echo "Starting evaluation on aime24 on GPU ${gpus[0]}"
-    lighteval vllm $MODEL_ARGS "lighteval|aime24|0|0" \
-        --use-chat-template \
+    lighteval vllm $MODEL_ARGS "lighteval|aime24|0" \
         --output-dir $OUTPUT_DIR \
         2>&1 | tee $LOG_DIR/aime24_${timestamp}.log
 )

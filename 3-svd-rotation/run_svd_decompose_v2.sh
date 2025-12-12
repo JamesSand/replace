@@ -8,18 +8,16 @@ set -euo pipefail
 SCRIPT="svd_decompose.py"
 # SCRIPT="svd_decompose_debug.py"
 
-# 三个模型 ID
-MODEL_IDS=(
-  "Qwen/Qwen2.5-VL-3B-Instruct"
-  "IffYuan/Embodied-R1-3B-Stage1"
-  "IffYuan/Embodied-R1-3B-v1"
-)
-
+# # 三个模型 ID
 # MODEL_IDS=(
-#   "Qwen/Qwen2.5-Math-1.5B"
-#   "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
-#   "agentica-org/DeepScaleR-1.5B-Preview"
+#   "Qwen/Qwen2.5-VL-3B-Instruct"
+#   "IffYuan/Embodied-R1-3B-Stage1"
+#   "IffYuan/Embodied-R1-3B-v1"
 # )
+
+MODEL_IDS=(
+  "agentica-org/DeepCoder-1.5B-Preview"
+)
 
 LOG_DIR="logs"
 mkdir -p "${LOG_DIR}"
