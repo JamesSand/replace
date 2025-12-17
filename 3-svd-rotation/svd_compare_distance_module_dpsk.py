@@ -267,6 +267,6 @@ if __name__ == "__main__":
     analyze_and_plot_aggregated_by_module(
         layer_indices=layer_indices,
         module_map=module_map,
-        r_cap=256,
+        r_cap=None,
         out_png_prefix="module_level_stats"
     )
