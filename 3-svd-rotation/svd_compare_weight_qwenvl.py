@@ -356,13 +356,12 @@ if __name__ == "__main__":
         # 如果需要分析 language 层，取消下面的注释
     ]
     
-    plot_layer_mse_curves(layer_configs, output_path=output_path)
-    
+    # plot_layer_mse_curves(layer_configs, output_path=output_path)
     
     # for language parts
     layer_start = 0
-    # layer_end = 32
-    layer_end = 21
+    layer_end = 32
+    # layer_end = 21
     
     output_path = "qwen_vl_weights_mse_curves_language.png"
     
@@ -377,37 +376,37 @@ if __name__ == "__main__":
     
     layer_configs = [
         {
-            'name': 'model.layers.{}.self_attn.q_proj.weight',
+            'name': 'model.language_model.layers.{}.self_attn.q_proj.weight',
             'range': range(layer_start, layer_end),
             'label': 'Language Q'
         },
         {
-            'name': 'model.layers.{}.self_attn.k_proj.weight',
+            'name': 'model.language_model.layers.{}.self_attn.k_proj.weight',
             'range': range(layer_start, layer_end),
             'label': 'Language K'
         },
         {
-            'name': 'model.layers.{}.self_attn.v_proj.weight',
+            'name': 'model.language_model.layers.{}.self_attn.v_proj.weight',
             'range': range(layer_start, layer_end),
             'label': 'Language V'
         },
         {
-            'name': 'model.layers.{}.self_attn.o_proj.weight',
+            'name': 'model.language_model.layers.{}.self_attn.o_proj.weight',
             'range': range(layer_start, layer_end),
             'label': 'Language O'
         },
         {
-            'name': 'model.layers.{}.mlp.down_proj.weight',
+            'name': 'model.language_model.layers.{}.mlp.down_proj.weight',
             'range': range(layer_start, layer_end),
             'label': 'Language MLP Down'
         },
         {
-            'name': 'model.layers.{}.mlp.gate_proj.weight',
+            'name': 'model.language_model.layers.{}.mlp.gate_proj.weight',
             'range': range(layer_start, layer_end),
             'label': 'Language MLP Gate'
         },
         {
-            'name': 'model.layers.{}.mlp.up_proj.weight',
+            'name': 'model.language_model.layers.{}.mlp.up_proj.weight',
             'range': range(layer_start, layer_end),
             'label': 'Language MLP Up'
         },
