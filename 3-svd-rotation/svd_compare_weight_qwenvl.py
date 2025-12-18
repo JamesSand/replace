@@ -313,8 +313,8 @@ if __name__ == "__main__":
     
     # for vision parts
     layer_start = 0
-    # layer_end = 32
-    layer_end = 21
+    layer_end = 32
+    # layer_end = 21
     
     output_path = "qwenvl_weights_mse_curves_vision.png"
     
@@ -356,7 +356,7 @@ if __name__ == "__main__":
         # 如果需要分析 language 层，取消下面的注释
     ]
     
-    # plot_layer_mse_curves(layer_configs, output_path=output_path)
+    plot_layer_mse_curves(layer_configs, output_path=output_path)
     
     # for language parts
     layer_start = 0
@@ -412,7 +412,7 @@ if __name__ == "__main__":
         },
     ]
     
-    plot_layer_mse_curves(layer_configs, output_path=output_path)
+    # plot_layer_mse_curves(layer_configs, output_path=output_path)
     
     
 
