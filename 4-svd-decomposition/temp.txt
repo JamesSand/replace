@@ -1,0 +1,4 @@
+parser.add_argument("--model_before", type=str, default="/home/sliu/zhizhou/workspace/rotation-project/shared_folder/hf_models/Llama-3.2-3B-Instruct", help="HF model id/path (before)")
+    parser.add_argument("--model_after", type=str, default="/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/ckpts/Llama-3.2-3B-Instruct/Llama-3.2-3B-Instruct-sgd-lr1e-2-g137/fsdp-converted/iter_0000200", help="HF model id/path (after)")
+
+
