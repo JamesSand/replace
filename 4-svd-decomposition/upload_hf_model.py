@@ -4,7 +4,7 @@ from huggingface_hub import HfApi
 # get your token here
 # https://huggingface.co/settings/tokens
 
-local_folder = "/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/fsdp_converted/llama-muon-muonlr1e-4-spectral_norm-muonadamlr1e-6-20260110_005142-global_step_200"
+local_folder = "/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/fsdp_converted/llama-adamw-lr1e-6-20260110_015014-global_step_200"
 
 basename = os.path.basename(local_folder)
 

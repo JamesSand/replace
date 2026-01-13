@@ -1,4 +1,8 @@
 
+2-blend/*cache
+2-blend/*output
+
+
 __pycache__/
 
 **/*.whl
