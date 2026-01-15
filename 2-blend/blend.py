@@ -231,6 +231,8 @@ def stage_merge(
                 continue
 
             # sigma blend
+            # Sa for after, Sb for before
+            # 0 means full before, 1 means full after
             S_blend = alpha * S_a + (1.0 - alpha) * S_b
 
             # reconstruct

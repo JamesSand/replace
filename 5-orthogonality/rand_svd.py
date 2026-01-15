@@ -1,25 +1,37 @@
 import torch
 
 # # random init n * n matrix 
-# n = 100
-# m = 200
-
 n = 200
 m = 100
 
-matrix_a = torch.randn(n, m)
-matrix_b = matrix_a + 1e-3 * torch.randn(n, m)
+W = torch.randn(n, m)
+
+# 两个 base
+# W1 = W + deltaW1
+# W2 = W + deltaW2
+
+# W1 and W2 I distance 很大
+
+# W 和 W1 和 I distance 很小
+
+# dis(W, W1) < dis(W1, W2)
+
+
+delta_W = 1e-1 * torch.randn(n, m)
+updated_W = W + delta_W
 
 # do svd for a
-U_a, S_a, Vh_a = torch.linalg.svd(matrix_a, full_matrices=False)
+U_a, S_a, Vh_a = torch.linalg.svd(W, full_matrices=False)
 # do svd for b
-U_b, S_b, Vh_b = torch.linalg.svd(matrix_b, full_matrices=False)
+U_b, S_b, Vh_b = torch.linalg.svd(updated_W, full_matrices=False)
 
 V_a = Vh_a.T
 V_b = Vh_b.T
 
 Q_1 = U_a.T @ U_b
 Q_2 = V_a.T @ V_b
+
+I_orth = Q_1.T @ Q_2
 
 diff = Q_1 - Q_2
 
@@ -39,14 +51,10 @@ fig.colorbar(im0, ax=axes)
 fig.savefig("diff.png")
 plt.close()
 
-exit()
-
 
 # print(f"u shape: {U_a.shape}, {U_b.shape}")
 # print(f"v shape: {V_a.shape}, {V_b.shape}")
 # print(f"q shape: {Q_1.shape}, {Q_2.shape}")
-
-I_orth = Q_1.T @ Q_2
 
 # printdiagnal elements
 diag_elements = torch.diagonal(I_orth)
