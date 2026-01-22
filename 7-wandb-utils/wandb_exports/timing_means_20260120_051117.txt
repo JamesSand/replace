@@ -1,0 +1,16 @@
+Project: zhizhousha/debug0110
+Selected runs: 6
+
+Per-run means:
+                             run_name   run_id  mean:timing_s/update_actor  mean:timing_s/step  mean:timing_s/gen
+qwen1.7b-adam-reset-muon-lr-1e-5-fp64 h85dl6yb                  101.425731          229.570829          61.639743
+qwen1.7b-adam-reset-muon-lr-1e-6-fp64 ralfcj40                  101.769167          229.283626          62.007628
+qwen1.7b-adam-reset-muon-lr-5e-6-fp64 jtqkgzly                  101.680265          234.631477          61.698959
+qwen1.7b-adam-reset-muon-lr-1e-5-fp64 s5adwshm                  101.269811          257.837989          92.404298
+qwen1.7b-adam-reset-muon-lr-5e-6-fp64 fwxmz1d3                  101.661040          257.112990          84.923100
+qwen1.7b-adam-reset-muon-lr-1e-6-fp64 f5ztncnx                  102.603185          221.369908          59.068736
+
+Overall (all selected runs concatenated) means:
+  timing_s/update_actor: 101.72090679638612
+  timing_s/step: 235.97542947409744
+  timing_s/gen: 67.71096613210715
