@@ -178,6 +178,20 @@ def main():
     U32o = _msign_real(U32, compute_dtype=torch.float64)
     V32o = _msign_real(V32, compute_dtype=torch.float64)
     # End: here you choose which algo to perform projection
+
+    # calcualte the f norm of U and V, and print them out
+    exptected_f_norm = m ** 0.5  # since U and V should be orthogonal matrices
+    fnorm_U = torch.norm(U32o, p='fro')
+    fnorm_V = torch.norm(V32o, p='fro')
+    print('-' * 50)
+    print(f"Expected Frobenius norm (sqrt of matrix size): {exptected_f_norm:.6f}")
+    print(f"Frobenius norm of U after projection: {fnorm_U.item()}")
+    print(f"Frobenius norm of V after projection: {fnorm_V.item()}")
+    print('-' * 50)
+    print(f"diff U F norm and exptected F norm {exptected_f_norm - fnorm_U.item()}")
+    print(f"diff V F norm and exptected F norm {exptected_f_norm - fnorm_V.item()}")
+    breakpoint()
+    print()
     
     # back to fp32
     U32o = U32o.to(torch.float32)
