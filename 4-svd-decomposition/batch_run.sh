@@ -3,7 +3,7 @@ set -ex
 
 # no change here
 fsdp_merged_dir="/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/fsdp_converted"
-model_before_path="/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/hf_models/Qwen3-1.7B-Base"
+model_before_path="/fast/sliu/zhizhou/workspace/rotation-project/Lucky_RL/hf_models/Qwen3-1.7B-Base"
 
 # batch to process (edit this list)
 inputs=(
@@ -16,8 +16,10 @@ inputs=(
   # "/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/ckpts_verl/debug0110/qwen3-1.7b-base-sgd-lr1e-2-kl-losscoef0.001-20260111_033800-g134/global_step_100/actor"
   # "/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/ckpts_verl/debug0110/qwen3-1.7b-base-sgd-lr1e-2-kl-losscoef0.001-20260111_033800-g134/global_step_150/actor"
   # "/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/ckpts_verl/debug0110/qwen3-1.7b-base-sgd-lr1e-2-kl-losscoef0.001-20260111_033800-g134/global_step_200/actor"
-  "/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/ckpts_verl/debug0110/qwen1.7b-adam-reset-muon-lr-1e-6-fp64/global_step_200/actor"
-  "/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/ckpts_verl/debug0110/qwen1.7b-adam-reset-muon-lr-1e-6-fp64/global_step_20/actor"
+  # "/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/ckpts_verl/debug0110/qwen1.7b-adam-reset-muon-lr-1e-6-fp64/global_step_200/actor"
+  # "/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/ckpts_verl/debug0110/qwen1.7b-adam-reset-muon-lr-1e-6-fp64/global_step_20/actor"
+  # "/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/ckpts_verl/debug0110/qwen3-1.7b-base-adamw-lr1e-6-kl-losscoef0.001-20260111_033800-g137/global_step_200/actor"
+  "/fast/sliu/zhizhou/workspace/rotation-project/shared_folder/ckpts_verl/debug0110/qwen3-1.7b-base-adamw-lr1e-5-kl-losscoef0.001-20260112_232037-g147/global_step_200/actor"
 )
 
 for fsdp_input_path in "${inputs[@]}"; do
