@@ -3,6 +3,8 @@
 
 4-svd-decomposition
 
+plot_reproduce
+
 __pycache__/
 
 *.json
