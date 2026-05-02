@@ -1,0 +1,20 @@
+/home/local/eda-s01/hanqing/tools/miniforge3/envs/luck168/lib/python3.12/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/home/local/eda-s01/hanqing/tools/miniforge3/envs/luck168/lib/python3.12/site-packages/transformers/models/auto/modeling_auto.py:2284: FutureWarning: The class `AutoModelForVision2Seq` is deprecated and will be removed in v5.0. Please use `AutoModelForImageTextToText` instead.
+  warnings.warn(
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading Models in Float32...
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.27it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.54it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.50it/s]
+/home/local/eda-s01/hanqing/tools/miniforge3/envs/luck168/lib/python3.12/site-packages/transformers/models/auto/modeling_auto.py:2284: FutureWarning: The class `AutoModelForVision2Seq` is deprecated and will be removed in v5.0. Please use `AutoModelForImageTextToText` instead.
+  warnings.warn(
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.90it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.49it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.38it/s]
+
+=== High-Precision Decomposition (mlp.up_proj) ===
+Baseline Drift (Actual Change): 7.905873e-09
+Rotation Model Error          : 6.093065e-09
+----------------------------------------
+1. Energy Error (Sigma Change): 8.505883e-13
+2. Drift Error (Subspace)     : 6.092188e-09
+----------------------------------------
+>> RESULT: Error is dominated by SUBSPACE DRIFT (7162.3x larger than Energy Error).
+   The model kept singular values fixed, but moved the feature subspace.

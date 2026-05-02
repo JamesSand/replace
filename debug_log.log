@@ -1,0 +1,76 @@
+/home/local/eda-s01/hanqing/tools/miniforge3/envs/luck168/lib/python3.12/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/home/local/eda-s01/hanqing/tools/miniforge3/envs/luck168/lib/python3.12/site-packages/transformers/models/auto/modeling_auto.py:2284: FutureWarning: The class `AutoModelForVision2Seq` is deprecated and will be removed in v5.0. Please use `AutoModelForImageTextToText` instead.
+  warnings.warn(
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading Models...
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.47it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.62it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.59it/s]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.21it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.56it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.49it/s]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.20it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.57it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.50it/s]
+Extracted weights for layer 10 and submodule mlp.gate_proj in the shapes:
+W0: (11008, 2048)
+W1: (11008, 2048)
+W2: (11008, 2048)
+
+Calculating Weight Drift Metrics:
+
+--- W0 vs W1 Drift Metrics ---
+MSE             : 9.352557e-10
+MAE             : 1.325293e-05
+Relative Error  : 0.100929%
+
+--- W1 vs W2 Drift Metrics ---
+MSE             : 8.007208e-09
+MAE             : 5.531513e-05
+Relative Error  : 0.295316%
+
+--- W0 vs W2 Drift Metrics ---
+MSE             : 8.531783e-09
+MAE             : 5.779337e-05
+Relative Error  : 0.304837%
+check two weights in W0, W1, W2:
+0.028686523 0.028686523 0.028564453
+Computing SVD...
+
+Spectrum Stability (Rel. Error): 0.000029
+Spectrum Stability Base->Stage1 (Rel. Error): 0.000010
+Spectrum Stability Stage1->Stage2 (Rel. Error): 0.000028
+
+=== Output Space (U) Analysis ===
+
+--- Base -> Stage 1 (Subspace Stability) ---
+Formula vs Solved MSE  : 0.000000e+00
+Orthogonality Gap      : 1.019370e-04
+>> VERDICT: Pure Rotation (Subspace is Stable)
+
+--- Stage 1 -> Stage 2 (Subspace Stability) ---
+Formula vs Solved MSE  : 0.000000e+00
+Orthogonality Gap      : 1.100954e-03
+>> VERDICT: Pure Rotation (Subspace is Stable)
+
+=== Input Space (V) Analysis ===
+
+--- Base -> Stage 1 (Subspace Stability) ---
+Formula vs Solved MSE  : 0.000000e+00
+Orthogonality Gap      : 2.845880e-13
+>> VERDICT: Pure Rotation (Subspace is Stable)
+
+--- Stage 1 -> Stage 2 (Subspace Stability) ---
+Formula vs Solved MSE  : 0.000000e+00
+Orthogonality Gap      : 2.771371e-13
+>> VERDICT: Pure Rotation (Subspace is Stable)
+
+--- Rotation Reconstruction (Strong Proof) Metrics ---
+MSE             : 6.956674e-09
+MAE             : 6.199286e-05
+Relative Error  : 0.275270%
+
+--- Baseline Drift (Actual Change) Metrics ---
+MSE             : 8.531783e-09
+MAE             : 5.779337e-05
+Relative Error  : 0.304836%
+
+--- Rotation Reconstruction (Direct Base->Stage2) Metrics ---
+MSE             : 6.527467e-09
+MAE             : 5.972400e-05
+Relative Error  : 0.266643%

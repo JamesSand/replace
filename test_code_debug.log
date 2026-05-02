@@ -1,0 +1,120 @@
+/home/local/eda-s01/hanqing/tools/miniforge3/envs/luck168/lib/python3.12/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/home/local/eda-s01/hanqing/tools/miniforge3/envs/luck168/lib/python3.12/site-packages/transformers/models/auto/modeling_auto.py:2284: FutureWarning: The class `AutoModelForVision2Seq` is deprecated and will be removed in v5.0. Please use `AutoModelForImageTextToText` instead.
+  warnings.warn(
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading Models (Float64 for Precision)...
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.48it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.63it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.61it/s]
+/home/local/eda-s01/hanqing/tools/miniforge3/envs/luck168/lib/python3.12/site-packages/transformers/models/auto/modeling_auto.py:2284: FutureWarning: The class `AutoModelForVision2Seq` is deprecated and will be removed in v5.0. Please use `AutoModelForImageTextToText` instead.
+  warnings.warn(
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.25it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.62it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.55it/s]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.26it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.65it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.58it/s]
+
+=== Scanning Language Layers ===
+Processing Lang_L0.self_attn.q_proj...
+  Base->Stage1    | Spec: 1.4e-05 | InnerRel: 1.4e-05 | AmbRel: 1.4e-05
+  Stage1->Stage2  | Spec: 4.8e-05 | InnerRel: 4.8e-05 | AmbRel: 4.8e-05
+  Base->Stage2    | Spec: 4.9e-05 | InnerRel: 4.9e-05 | AmbRel: 4.9e-05
+Processing Lang_L0.self_attn.k_proj...
+  Base->Stage1    | Spec: 1.1e-05 | InnerRel: 3.8e-04 | AmbRel: 1.1e-05
+  Stage1->Stage2  | Spec: 3.8e-05 | InnerRel: 1.2e-03 | AmbRel: 3.8e-05
+  Base->Stage2    | Spec: 3.8e-05 | InnerRel: 1.3e-03 | AmbRel: 3.8e-05
+Processing Lang_L0.self_attn.v_proj...
+  Base->Stage1    | Spec: 3.9e-05 | InnerRel: 1.4e-03 | AmbRel: 3.9e-05
+  Stage1->Stage2  | Spec: 1.3e-04 | InnerRel: 3.7e-03 | AmbRel: 1.3e-04
+  Base->Stage2    | Spec: 1.3e-04 | InnerRel: 3.9e-03 | AmbRel: 1.3e-04
+Processing Lang_L0.self_attn.o_proj...
+  Base->Stage1    | Spec: 2.8e-05 | InnerRel: 2.8e-05 | AmbRel: 2.8e-05
+  Stage1->Stage2  | Spec: 7.7e-05 | InnerRel: 7.7e-05 | AmbRel: 7.7e-05
+  Base->Stage2    | Spec: 8.0e-05 | InnerRel: 8.0e-05 | AmbRel: 8.0e-05
+Processing Lang_L0.mlp.gate_proj...
+  Base->Stage1    | Spec: 1.0e-05 | InnerRel: 9.6e-04 | AmbRel: 1.0e-05
+  Stage1->Stage2  | Spec: 3.2e-05 | InnerRel: 2.9e-03 | AmbRel: 3.2e-05
+  Base->Stage2    | Spec: 3.3e-05 | InnerRel: 3.0e-03 | AmbRel: 3.3e-05
+Processing Lang_L0.mlp.up_proj...
+  Base->Stage1    | Spec: 1.1e-05 | InnerRel: 1.1e-03 | AmbRel: 1.1e-05
+  Stage1->Stage2  | Spec: 3.5e-05 | InnerRel: 3.2e-03 | AmbRel: 3.5e-05
+  Base->Stage2    | Spec: 3.7e-05 | InnerRel: 3.3e-03 | AmbRel: 3.7e-05
+Processing Lang_L0.mlp.down_proj...
+  Base->Stage1    | Spec: 1.2e-05 | InnerRel: 1.0e-03 | AmbRel: 1.2e-05
+  Stage1->Stage2  | Spec: 3.7e-05 | InnerRel: 3.0e-03 | AmbRel: 3.7e-05
+  Base->Stage2    | Spec: 3.9e-05 | InnerRel: 3.1e-03 | AmbRel: 3.9e-05
+Processing Lang_L1.self_attn.q_proj...
+  Base->Stage1    | Spec: 1.8e-05 | InnerRel: 1.8e-05 | AmbRel: 1.8e-05
+  Stage1->Stage2  | Spec: 5.9e-05 | InnerRel: 5.9e-05 | AmbRel: 5.9e-05
+  Base->Stage2    | Spec: 6.1e-05 | InnerRel: 6.1e-05 | AmbRel: 6.1e-05
+Processing Lang_L1.self_attn.k_proj...
+  Base->Stage1    | Spec: 1.4e-05 | InnerRel: 4.4e-04 | AmbRel: 1.4e-05
+  Stage1->Stage2  | Spec: 5.0e-05 | InnerRel: 1.3e-03 | AmbRel: 5.0e-05
+  Base->Stage2    | Spec: 5.3e-05 | InnerRel: 1.4e-03 | AmbRel: 5.3e-05
+Processing Lang_L1.self_attn.v_proj...
+  Base->Stage1    | Spec: 3.7e-05 | InnerRel: 1.3e-03 | AmbRel: 3.7e-05
+  Stage1->Stage2  | Spec: 1.2e-04 | InnerRel: 3.4e-03 | AmbRel: 1.2e-04
+  Base->Stage2    | Spec: 1.2e-04 | InnerRel: 3.6e-03 | AmbRel: 1.2e-04
+Processing Lang_L1.self_attn.o_proj...
+  Base->Stage1    | Spec: 2.8e-05 | InnerRel: 2.8e-05 | AmbRel: 2.8e-05
+  Stage1->Stage2  | Spec: 7.4e-05 | InnerRel: 7.4e-05 | AmbRel: 7.4e-05
+  Base->Stage2    | Spec: 7.7e-05 | InnerRel: 7.7e-05 | AmbRel: 7.7e-05
+Processing Lang_L1.mlp.gate_proj...
+  Base->Stage1    | Spec: 2.5e-05 | InnerRel: 7.3e-05 | AmbRel: 2.5e-05
+  Stage1->Stage2  | Spec: 1.1e-04 | InnerRel: 1.7e-04 | AmbRel: 1.1e-04
+  Base->Stage2    | Spec: 9.9e-05 | InnerRel: 1.5e-04 | AmbRel: 9.9e-05
+Processing Lang_L1.mlp.up_proj...
+  Base->Stage1    | Spec: 1.6e-05 | InnerRel: 5.5e-05 | AmbRel: 1.6e-05
+  Stage1->Stage2  | Spec: 5.5e-05 | InnerRel: 1.0e-04 | AmbRel: 5.5e-05
+  Base->Stage2    | Spec: 5.6e-05 | InnerRel: 8.9e-05 | AmbRel: 5.6e-05
+Processing Lang_L1.mlp.down_proj...
+  Base->Stage1    | Spec: 3.1e-05 | InnerRel: 1.7e-04 | AmbRel: 3.1e-05
+  Stage1->Stage2  | Spec: 7.1e-05 | InnerRel: 3.3e-04 | AmbRel: 7.1e-05
+  Base->Stage2    | Spec: 7.3e-05 | InnerRel: 2.8e-04 | AmbRel: 7.3e-05
+
+=== Scanning Vision Layers ===
+Processing Vis_L0.attn.qkv...
+  Base->Stage1    | Spec: 4.7e-05 | InnerRel: 9.7e-04 | AmbRel: 4.7e-05
+  Stage1->Stage2  | Spec: 1.5e-04 | InnerRel: 2.7e-03 | AmbRel: 1.5e-04
+  Base->Stage2    | Spec: 1.6e-04 | InnerRel: 2.7e-03 | AmbRel: 1.6e-04
+Processing Vis_L0.attn.proj...
+  Base->Stage1    | Spec: 8.6e-05 | InnerRel: 8.6e-05 | AmbRel: 8.6e-05
+  Stage1->Stage2  | Spec: 2.3e-04 | InnerRel: 2.3e-04 | AmbRel: 2.3e-04
+  Base->Stage2    | Spec: 2.3e-04 | InnerRel: 2.3e-04 | AmbRel: 2.3e-04
+Processing Vis_L0.mlp.gate_proj...
+  Base->Stage1    | Spec: 3.9e-05 | InnerRel: 1.3e-03 | AmbRel: 3.9e-05
+  Stage1->Stage2  | Spec: 1.4e-04 | InnerRel: 3.7e-03 | AmbRel: 1.4e-04
+  Base->Stage2    | Spec: 1.4e-04 | InnerRel: 3.7e-03 | AmbRel: 1.4e-04
+Processing Vis_L0.mlp.up_proj...
+  Base->Stage1    | Spec: 3.7e-05 | InnerRel: 1.2e-03 | AmbRel: 3.7e-05
+  Stage1->Stage2  | Spec: 1.4e-04 | InnerRel: 3.5e-03 | AmbRel: 1.4e-04
+  Base->Stage2    | Spec: 1.3e-04 | InnerRel: 3.6e-03 | AmbRel: 1.3e-04
+Processing Vis_L0.mlp.down_proj...
+  Base->Stage1    | Spec: 5.7e-05 | InnerRel: 1.2e-03 | AmbRel: 5.7e-05
+  Stage1->Stage2  | Spec: 1.6e-04 | InnerRel: 3.3e-03 | AmbRel: 1.6e-04
+  Base->Stage2    | Spec: 1.6e-04 | InnerRel: 3.4e-03 | AmbRel: 1.6e-04
+Processing Vis_L1.attn.qkv...
+  Base->Stage1    | Spec: 6.7e-05 | InnerRel: 1.2e-03 | AmbRel: 6.7e-05
+  Stage1->Stage2  | Spec: 2.5e-04 | InnerRel: 3.1e-03 | AmbRel: 2.5e-04
+  Base->Stage2    | Spec: 2.6e-04 | InnerRel: 3.1e-03 | AmbRel: 2.6e-04
+Processing Vis_L1.attn.proj...
+  Base->Stage1    | Spec: 7.8e-05 | InnerRel: 7.8e-05 | AmbRel: 7.8e-05
+  Stage1->Stage2  | Spec: 2.3e-04 | InnerRel: 2.3e-04 | AmbRel: 2.3e-04
+  Base->Stage2    | Spec: 2.3e-04 | InnerRel: 2.3e-04 | AmbRel: 2.3e-04
+Processing Vis_L1.mlp.gate_proj...
+  Base->Stage1    | Spec: 3.9e-05 | InnerRel: 1.4e-03 | AmbRel: 3.9e-05
+  Stage1->Stage2  | Spec: 1.3e-04 | InnerRel: 4.1e-03 | AmbRel: 1.3e-04
+  Base->Stage2    | Spec: 1.4e-04 | InnerRel: 4.2e-03 | AmbRel: 1.4e-04
+Processing Vis_L1.mlp.up_proj...
+  Base->Stage1    | Spec: 3.9e-05 | InnerRel: 1.5e-03 | AmbRel: 3.9e-05
+  Stage1->Stage2  | Spec: 1.2e-04 | InnerRel: 4.2e-03 | AmbRel: 1.2e-04
+  Base->Stage2    | Spec: 1.2e-04 | InnerRel: 4.3e-03 | AmbRel: 1.2e-04
+Processing Vis_L1.mlp.down_proj...
+  Base->Stage1    | Spec: 5.0e-05 | InnerRel: 1.4e-03 | AmbRel: 5.0e-05
+  Stage1->Stage2  | Spec: 1.7e-04 | InnerRel: 3.8e-03 | AmbRel: 1.7e-04
+  Base->Stage2    | Spec: 1.8e-04 | InnerRel: 3.8e-03 | AmbRel: 1.8e-04
+
+Saved metrics to stiefel_analysis_metrics.csv
+
+=== MEETING SUMMARY (Averages) ===
+                Spectrum_RelErr  Inner_RelErr  Ambient_RelErr
+Transition                                                   
+Base->Stage1           0.000035      0.000719        0.000035
+Base->Stage2           0.000113      0.002069        0.000113
+Stage1->Stage2         0.000109      0.002020        0.000109
