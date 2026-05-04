@@ -1,0 +1,24 @@
+
+Generating plots for Domain: Lang...
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Lang_Spectrum_RelErr.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Lang_Baseline_RelErr.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Lang_Inner_RelErr.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Lang_Ambient_RelErr.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Lang_Baseline_MSE.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Lang_Inner_MSE.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Lang_Ambient_MSE.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Lang_Baseline_MAE.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Lang_Inner_MAE.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Lang_Ambient_MAE.png
+
+Generating plots for Domain: Vis...
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Vis_Spectrum_RelErr.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Vis_Baseline_RelErr.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Vis_Inner_RelErr.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Vis_Ambient_RelErr.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Vis_Baseline_MSE.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Vis_Inner_MSE.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Vis_Ambient_MSE.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Vis_Baseline_MAE.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Vis_Inner_MAE.png
+  -> Saved: /ssd1/zhizhou/workspace/rotation-project/replace/plot_reproduce/plots/Vis_Ambient_MAE.png
