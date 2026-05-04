@@ -63,7 +63,7 @@ def plot_stiefel_analysis_separated(csv_path="/ssd1/zhizhou/workspace/rotation-p
                 markersize=5,
                 height=4,
                 aspect=1.2,
-                linewidth=2.5,
+                linewidth=3.5,
                 palette="tab10",     # Distinct colors
                 facet_kws={'sharey': False, 'sharex': True} # Let Y-axis scale adapt
             )
