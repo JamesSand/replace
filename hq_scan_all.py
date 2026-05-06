@@ -104,6 +104,7 @@ def solve_procrustes(U_src, U_tgt):
 def analyze_triplet(name, W0, W1, W2, results_list):
     """
     Performs the full A/B/C analysis for the triplet W0->W1->W2.
+    Plus new: four model class distances (e_src, e_L, e_R, e_tgt) and principal angles.
     """
     if W0 is None or W1 is None or W2 is None:
         return
@@ -112,7 +113,7 @@ def analyze_triplet(name, W0, W1, W2, results_list):
     U0, S0, V0h = get_svd(W0)
     U1, S1, V1h = get_svd(W1)
     U2, S2, V2h = get_svd(W2)
-    
+
     # Transpose Vh to get V (columns)
     V0, V1, V2 = V0h.T, V1h.T, V2h.T
 
@@ -143,27 +144,88 @@ def analyze_triplet(name, W0, W1, W2, results_list):
         # We enforce strict subspace conservation (mixing only).
         R_u = solve_procrustes(U_src, U_tgt)
         R_v = solve_procrustes(V_src, V_tgt)
-        
+
         W_inner = (U_src @ R_u) @ np.diag(S_src) @ (V_src @ R_v).T
-        
+
         row["Inner_MSE"], row["Inner_MAE"], row["Inner_RelErr"] = calc_metrics(W_tgt, W_inner)
 
         # --- C. Ambient Stiefel (Subspace Transport) ---
         # Hypothesis: W_tgt ≈ U_tgt @ S_src @ V_tgt.T
         # We allow subspace drift (U_src -> U_tgt) but force energy conservation (S_src).
         W_ambient = U_tgt @ np.diag(S_src) @ V_tgt.T
-        
+
         row["Ambient_MSE"], row["Ambient_MAE"], row["Ambient_RelErr"] = calc_metrics(W_tgt, W_ambient)
-        
+
         # --- Comparison Metric ---
         # Ratio > 1 means Ambient is better (Drift is real). Ratio ~ 1 means Rotation is sufficient.
         row["Drift_Ratio"] = row["Inner_MSE"] / (row["Ambient_MSE"] + 1e-30)
 
+        # --- NEW: Four Model Classes (Corollary 3.3) ---
+        # Determine truncation rank from S_src
+        r = len(S_src)  # Use full rank returned by SVD
+
+        # Reconstruct truncated matrices using truncation rank
+        W_src_r = U_src[:, :r] @ np.diag(S_src[:r]) @ V_src[:, :r].T
+        W_tgt_r = U_tgt[:, :r] @ np.diag(S_tgt[:r]) @ V_tgt[:, :r].T
+
+        # Projector matrices (rank-r)
+        P_src = U_src[:, :r] @ U_src[:, :r].T  # shape: (m, m)
+        Q_src = V_src[:, :r] @ V_src[:, :r].T  # shape: (n, n)
+
+        # (i) Source-subspace fit (e_src = Inner model)
+        e_src = np.linalg.norm(W_tgt_r - P_src @ W_tgt_r @ Q_src, 'fro')
+
+        # (ii) Left-only hybrid (e_L)
+        # Model class L(src→tgt): left fixed at P_src, right free to Q_tgt
+        # Optimal reconstruction: P_src @ W_tgt_r
+        e_L = np.linalg.norm(W_tgt_r - P_src @ W_tgt_r, 'fro')
+
+        # (iii) Right-only hybrid (e_R)
+        # Model class R(src→tgt): right fixed at Q_src, left free to P_tgt
+        # Optimal reconstruction: W_tgt_r @ Q_src
+        e_R = np.linalg.norm(W_tgt_r - W_tgt_r @ Q_src, 'fro')
+
+        # (iv) Target-subspace transport (e_tgt = Ambient model)
+        # By definition, ambient transport has e_tgt ≈ ||Sigma_tgt - Sigma_src||_F
+        e_tgt = np.linalg.norm(S_tgt[:r] - S_src[:r])
+
+        row["e_src"] = e_src
+        row["e_L"] = e_L
+        row["e_R"] = e_R
+        row["e_tgt"] = e_tgt
+
+        # --- NEW: Principal Angles (sin-form, from Corollary 3.3) ---
+        # sin∠(U_src, U_tgt) = ||(I - P_src) U_tgt[:, :r]||_F
+        # sin∠(V_src, V_tgt) = ||(I - Q_src) V_tgt[:, :r]||_F
+
+        I_r = np.eye(r)
+
+        # Project target singular vectors onto source orthogonal complement
+        U_tgt_r = U_tgt[:, :r]
+        V_tgt_r = V_tgt[:, :r]
+
+        # Residuals (sine of principal angles)
+        angle_U_sin = np.linalg.norm((np.eye(U_src.shape[0]) - P_src) @ U_tgt_r, 'fro')
+        angle_V_sin = np.linalg.norm((np.eye(V_src.shape[0]) - Q_src) @ V_tgt_r, 'fro')
+
+        # Convert to degrees for readability (arcsin of sine value)
+        # Note: for small angles, angle_sin ≈ angle_rad, so angle_rad ≈ arcsin(angle_sin)
+        # But arcsin clips to [-1, 1], so we saturate
+        angle_U_deg = np.degrees(np.arcsin(np.clip(angle_U_sin / np.sqrt(r), -1.0, 1.0)))
+        angle_V_deg = np.degrees(np.arcsin(np.clip(angle_V_sin / np.sqrt(r), -1.0, 1.0)))
+
+        row["angle_U_sin"] = angle_U_sin
+        row["angle_V_sin"] = angle_V_sin
+        row["angle_U_deg"] = angle_U_deg
+        row["angle_V_deg"] = angle_V_deg
+
         results_list.append(row)
-        
+
         # Live print for sanity
         print(f"{name}  {pair_label:15s} | Spec: {row['Spectrum_RelErr']:.1e} | Baseline_RelErr: {row['Baseline_RelErr']:.1e} | InnerRel: {row['Inner_RelErr']:.1e} | AmbRel: {row['Ambient_RelErr']:.1e}")
         print(f"    Baseline MSE: {row['Baseline_MSE']:.1e} | Inner MSE: {row['Inner_MSE']:.1e} | Ambient MSE: {row['Ambient_MSE']:.1e} | Drift Ratio: {row['Drift_Ratio']:.2f}")
+        print(f"    e_src: {e_src:.1e} | e_L: {e_L:.1e} | e_R: {e_R:.1e} | e_tgt: {e_tgt:.1e}")
+        print(f"    angle_U: {angle_U_deg:.2f}° | angle_V: {angle_V_deg:.2f}°")
 
 # --- Main ---
 
