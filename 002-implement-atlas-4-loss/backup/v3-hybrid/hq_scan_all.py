@@ -39,13 +39,10 @@ LANG_MODULES = [
 
 OUTPUT_CSV = "/ssd1/zhizhou/workspace/rotation-project/replace/002-implement-atlas-4-loss/stiefel_analysis_metrics.csv"
 
-# v4 multi-r: paper-strict formulation (matches PDF Theorem 3.1).
-# - Both source and target are first truncated to a fixed rank r.
-# - Distances are computed on the rank-r truncated target W_tgt^(r) only.
-# - e_tgt is the closed-form spectrum vector difference, NOT a matrix Frobenius distance.
-# - Run multiple r values per module (sharing the SVD) so we get a sensitivity sweep
-#   in one pass. CSV is in long form: one row per (Module, Transition, r).
-TRUNCATION_RANKS = [128, 256, 512, 1024]
+# Plan B: effective rank = smallest r s.t. cumulative SQUARED singular value
+# energy >= ENERGY_THRESHOLD * total. Used to truncate the source-side
+# projectors P_src / Q_src so they are NON-trivial on full-rank weights.
+ENERGY_THRESHOLD = 0.99
 
 # --- Helper Functions ---
 
@@ -109,10 +106,20 @@ def solve_procrustes(U_src, U_tgt):
     R, _ = scipy.linalg.orthogonal_procrustes(U_src, U_tgt)
     return R
 
+def effective_rank(S, threshold=ENERGY_THRESHOLD):
+    """Smallest r such that cumulative squared singular value sum / total >= threshold."""
+    energy = S ** 2
+    total = energy.sum()
+    if total <= 0:
+        return len(S)
+    cum = np.cumsum(energy)
+    r = int(np.searchsorted(cum, threshold * total) + 1)
+    return max(1, min(r, len(S)))
+
+
 def analyze_triplet(name, W0, W1, W2, results_list, domain="Unknown"):
     """
-    v4 paper-strict: SVD + 4 model class distances on a fixed truncation rank.
-    Keeps Inner/Ambient Procrustes residuals as auxiliary diagnostics.
+    Performs the full A/B/C analysis for the triplet W0->W1->W2.
     """
     if W0 is None or W1 is None or W2 is None:
         return
@@ -121,18 +128,11 @@ def analyze_triplet(name, W0, W1, W2, results_list, domain="Unknown"):
     U0, S0, V0h = get_svd(W0)
     U1, S1, V1h = get_svd(W1)
     U2, S2, V2h = get_svd(W2)
-
+    
     # Transpose Vh to get V (columns)
     V0, V1, V2 = V0h.T, V1h.T, V2h.T
 
-    # Skip module if smallest q is even smaller than smallest r we want to test.
-    q_min = min(len(S0), len(S1), len(S2))
-    smallest_r = min(TRUNCATION_RANKS)
-    if q_min <= smallest_r:
-        print(f"  [Skip] {name}: q={q_min} <= smallest r={smallest_r}")
-        return
-
-    # Define pairs to analyze
+    # Define pairs to analyze: (Source, Target, Label, Source_Label, Target_Label)
     pairs = [
         (W0, W1, U0, S0, V0, U1, S1, V1, "Base->Stage1"),
         (W1, W2, U1, S1, V1, U2, S2, V2, "Stage1->Stage2"),
@@ -140,95 +140,79 @@ def analyze_triplet(name, W0, W1, W2, results_list, domain="Unknown"):
     ]
 
     for (W_src, W_tgt, U_src, S_src, V_src, U_tgt, S_tgt, V_tgt, pair_label) in pairs:
-        # === Per-pair quantities (independent of r) — compute ONCE then repeat per r-row ===
+        row = {
+            "Module": name,
+            "Transition": pair_label,
+            "Domain": domain,
+        }
+
+        # --- A. Spectrum Stability ---
+        # How much did Sigma change? || S_tgt - S_src || / || S_src ||
         s_diff_norm = np.linalg.norm(S_tgt - S_src)
         s_src_norm = np.linalg.norm(S_src)
-        spec_relerr = s_diff_norm / (s_src_norm + 1e-10)
+        row["Spectrum_RelErr"] = s_diff_norm / (s_src_norm + 1e-10)
 
-        baseline_mse, baseline_mae, baseline_relerr = calc_metrics(W_tgt, W_src)
+        # Baseline Drift (Real change in weights)
+        row["Baseline_MSE"], row["Baseline_MAE"], row["Baseline_RelErr"] = calc_metrics(W_tgt, W_src)
 
+        # --- B. Inner Stiefel (Fiber Rotation) ---
+        # Hypothesis: W_tgt ≈ (U_src @ R_u) @ S_src @ (V_src @ R_v).T
+        # We enforce strict subspace conservation (mixing only).
         R_u = solve_procrustes(U_src, U_tgt)
         R_v = solve_procrustes(V_src, V_tgt)
+        
         W_inner = (U_src @ R_u) @ np.diag(S_src) @ (V_src @ R_v).T
-        inner_mse, inner_mae, inner_relerr = calc_metrics(W_tgt, W_inner)
+        
+        row["Inner_MSE"], row["Inner_MAE"], row["Inner_RelErr"] = calc_metrics(W_tgt, W_inner)
 
+        # --- C. Ambient Stiefel (Subspace Transport) ---
+        # Hypothesis: W_tgt ≈ U_tgt @ S_src @ V_tgt.T
+        # We allow subspace drift (U_src -> U_tgt) but force energy conservation (S_src).
         W_ambient = U_tgt @ np.diag(S_src) @ V_tgt.T
-        ambient_mse, ambient_mae, ambient_relerr = calc_metrics(W_tgt, W_ambient)
+        
+        row["Ambient_MSE"], row["Ambient_MAE"], row["Ambient_RelErr"] = calc_metrics(W_tgt, W_ambient)
 
-        drift_ratio = inner_mse / (ambient_mse + 1e-30)
-        total_energy = float((S_src ** 2).sum())
+        # --- Comparison Metric ---
+        # Ratio > 1 means Ambient is better (Drift is real). Ratio ~ 1 means Rotation is sufficient.
+        row["Drift_Ratio"] = row["Inner_MSE"] / (row["Ambient_MSE"] + 1e-30)
 
-        # === Per-r quantities ===
-        for r in TRUNCATION_RANKS:
-            if r >= q_min:
-                continue  # this r doesn't fit this module's spectrum length
+        # --- NEW (Plan B): Four Model Class Distances with Effective-Rank Truncation ---
+        # Use rank r = smallest k such that S_src[:k] explains >= ENERGY_THRESHOLD of total energy.
+        # This makes P_src / Q_src non-trivial projectors on full-rank weight matrices.
+        r = effective_rank(S_src, ENERGY_THRESHOLD)
+        row["r_eff"] = r
+        row["r_full"] = len(S_src)
+        row["r_ratio"] = r / len(S_src)
 
-            row = {
-                "Module": name,
-                "Transition": pair_label,
-                "Domain": domain,
-                "r": r,
-                "q": q_min,
-                # auxiliary (full-rank, repeated per r)
-                "Spectrum_RelErr": spec_relerr,
-                "Baseline_MSE": baseline_mse, "Baseline_MAE": baseline_mae, "Baseline_RelErr": baseline_relerr,
-                "Inner_MSE": inner_mse, "Inner_MAE": inner_mae, "Inner_RelErr": inner_relerr,
-                "Ambient_MSE": ambient_mse, "Ambient_MAE": ambient_mae, "Ambient_RelErr": ambient_relerr,
-                "Drift_Ratio": drift_ratio,
-            }
+        Ur = U_src[:, :r]    # (m, r)
+        Vr = V_src[:, :r]    # (n, r)
 
-            # Take rank-r truncated bases (don't form full m×m / n×n projectors)
-            Us_r = U_src[:, :r]
-            Vs_r = V_src[:, :r]
-            Ut_r = U_tgt[:, :r]
-            Vt_r = V_tgt[:, :r]
+        P_src = Ur @ Ur.T    # rank-r left projector (m, m)
+        Q_src = Vr @ Vr.T    # rank-r right projector (n, n)
 
-            # W_tgt^(r) = Ut_r diag(S_tgt[:r]) Vt_r^T
-            W_tgt_r = Ut_r @ np.diag(S_tgt[:r]) @ Vt_r.T
+        # e_src / e_L / e_R: rank-r truncated source-side projection.
+        #   These test "does W_tgt live in source's top-r subspaces?"
+        # e_tgt: ambient transport — FULL spectrum, free target subspaces.
+        #   Tests "can target's full structure be reconstructed using source's full
+        #   spectrum + a rotation?" (the natural semantics of A(j->i) class)
+        # Keeping e_tgt at full rank avoids burying the spectral-drift signal under
+        # the bottom-(1-threshold) truncation residual.
 
-            # Use efficient projection forms instead of forming P_src / Q_src explicitly:
-            #   P_src @ X = Us_r @ (Us_r.T @ X)
-            #   X @ Q_src = (X @ Vs_r) @ Vs_r.T
-            UsTW = Us_r.T @ W_tgt_r          # r × n
-            P_W = Us_r @ UsTW                 # m × n  (= P_src @ W_tgt_r)
-            WVs = W_tgt_r @ Vs_r              # m × r
-            W_Q = WVs @ Vs_r.T                # m × n  (= W_tgt_r @ Q_src)
-            P_W_Q = Us_r @ ((UsTW @ Vs_r) @ Vs_r.T)  # = P_src @ W_tgt_r @ Q_src
+        # e_src: target lives inside source's top-r row+col subspaces (class I(j))
+        row["e_src"] = np.linalg.norm(W_tgt - P_src @ W_tgt @ Q_src, 'fro')
+        # e_L: left subspace stays in source's top-r col space (class L)
+        row["e_L"]   = np.linalg.norm(W_tgt - P_src @ W_tgt, 'fro')
+        # e_R: right subspace stays in source's top-r row space (class R)
+        row["e_R"]   = np.linalg.norm(W_tgt - W_tgt @ Q_src, 'fro')
+        # e_tgt: full spectrum frozen at source, both subspaces free (class A)
+        row["e_tgt"] = np.linalg.norm(W_tgt - U_tgt @ np.diag(S_src) @ V_tgt.T, 'fro')
 
-            e_src = np.linalg.norm(W_tgt_r - P_W_Q, 'fro')
-            e_L   = np.linalg.norm(W_tgt_r - P_W,   'fro')
-            e_R   = np.linalg.norm(W_tgt_r - W_Q,   'fro')
-            e_tgt = float(np.linalg.norm(S_tgt[:r] - S_src[:r]))   # spectrum vector L2
+        results_list.append(row)
 
-            row["e_src"] = e_src
-            row["e_L"]   = e_L
-            row["e_R"]   = e_R
-            row["e_tgt"] = e_tgt
-
-            # Admissibility diagnostics
-            row["retained_energy_src"] = float((S_src[:r] ** 2).sum() / total_energy)
-            row["gap_abs"] = float(S_src[r-1] - S_src[r])
-            row["gap_rel"] = float(S_src[r-1] / max(S_src[r], 1e-30))
-
-            # Principal angles via sin∠ = sqrt(r - ||Us_r^T Ut_r||_F^2)  (cheaper than (I-P)U)
-            UsU = Us_r.T @ Ut_r   # r × r
-            VsV = Vs_r.T @ Vt_r   # r × r
-            angle_U_sin = float(np.sqrt(max(r - (UsU ** 2).sum(), 0.0)))
-            angle_V_sin = float(np.sqrt(max(r - (VsV ** 2).sum(), 0.0)))
-            angle_U_deg = float(np.degrees(np.arcsin(np.clip(angle_U_sin / np.sqrt(r), -1.0, 1.0))))
-            angle_V_deg = float(np.degrees(np.arcsin(np.clip(angle_V_sin / np.sqrt(r), -1.0, 1.0))))
-
-            row["angle_U_sin"] = angle_U_sin
-            row["angle_V_sin"] = angle_V_sin
-            row["angle_U_deg"] = angle_U_deg
-            row["angle_V_deg"] = angle_V_deg
-
-            results_list.append(row)
-
-            # Live print
-            print(f"  r={r:5d}/{q_min}  ret_E={row['retained_energy_src']:.3f}  "
-                  f"e_src={e_src:.3e} e_L={e_L:.3e} e_R={e_R:.3e} e_tgt={e_tgt:.3e}  "
-                  f"∠U={angle_U_deg:.2f}° ∠V={angle_V_deg:.2f}°")
+        # Live print for sanity
+        print(f"{name}  {pair_label:15s} | Spec: {row['Spectrum_RelErr']:.1e} | Baseline_RelErr: {row['Baseline_RelErr']:.1e} | InnerRel: {row['Inner_RelErr']:.1e} | AmbRel: {row['Ambient_RelErr']:.1e}")
+        print(f"    Baseline MSE: {row['Baseline_MSE']:.1e} | Inner MSE: {row['Inner_MSE']:.1e} | Ambient MSE: {row['Ambient_MSE']:.1e} | Drift Ratio: {row['Drift_Ratio']:.2f}")
+        print(f"    r_eff={r}/{len(S_src)} ({row['r_ratio']:.1%})  e_src: {row['e_src']:.3e} | e_L: {row['e_L']:.3e} | e_R: {row['e_R']:.3e} | e_tgt: {row['e_tgt']:.3e}")
 
 # --- Main ---
 
