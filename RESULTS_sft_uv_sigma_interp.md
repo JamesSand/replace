@@ -70,3 +70,74 @@ $$\widetilde{W}(\alpha) = U_{\text{SFT}}\,\bigl(\alpha\,\Sigma_{\text{RL}} + (1-
 **清理状态**：两个实验 pod 已删除；6 个 blend 模型（bf16, 各 3.4G）、全部生成 jsonl/parquet、逐层 sigma 日志保留在 `~/workspace/rl-opt-proj/sft_uv_blend/`，可随时复算或加密度补点（如 α∈{0.1,...,0.9} 或更多 RL checkpoint 对）。
 
 **⚠️ Infra 事故记录（建议上报）**：节点 `research-common-h100-087` 于 2026-07-13 23:19 UTC 发生"K8s 显示 Ready / 无污点标记，但 `kubectl exec` 无响应、节点上全部用户进程同时冻结"的故障，持续至少 2 小时未自愈；当时损失 4 个跑至 ~98% 的 olympiad 生成 + 1 个 LCB 打分阶段，已全部在 pod B 重跑补齐，数据无损失。
+
+## Handoff：复现指南（给后来者）
+
+三个 codebase（都在 `github.com/JamesSand/`，以下 commit 为本实验所用版本）：
+
+| repo | 分支/commit | 用途 |
+|---|---|---|
+| `replace` | `hanq` @ `d5fe2a1`+ | blend 脚本 + 本报告 + 图 |
+| `POLARIS` | `main` @ `7c72038` | math 评测（生成 + 打分） |
+| `ArcherCodeR` | `main` @ `7705bd3` | coding 评测（LCB v5，生成 + 判题一体） |
+
+### 第 0 步：环境（一个 venv 同时跑三样）
+
+Python 3.12 venv（本实验用 `~/venvs/vllm085`），关键包：
+
+```bash
+pip install vllm==0.8.5 ray "setuptools<81"        # setuptools<81 必须：verl 依赖 pkg_resources
+pip install pandas pyarrow datasets polars          # polars 必须：LCB 大 parquet 打分的读取 fallback
+pip install tensordict codetiming hydra-core omegaconf dill torchdata peft \
+            "math-verify[antlr4_9_3]" latex2sympy2 pylatexenc tabulate matplotlib
+pip install "flash-attn @ https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1+cu12torch2.6cxx11abiFALSE-cp312-cp312-linux_x86_64.whl"
+```
+
+`export HF_HOME=/shared/huggingface`（集群共享缓存）。算力：1.5B bf16 模型 1 卡/模型即可；预期耗时（H100，R1-Distill 系 long-CoT）：math 全套 ~8-10h/模型、LCB ~1.5-2h/模型；Nemotron 全套 ~4h。开 pod 的方法见 `~/workspace/low-precision-project/k8s-from-h100-pod/README-open-new-pods-from-h100.md`。
+
+### 第 1 步：blend 模型
+
+```bash
+cd replace
+python blend_sft_uv.py     # 顶部可改 MODEL_SFT / MODEL_RL / ALPHAS / 输出目录
+```
+
+产出 6 个 bf16 模型（各 ~3.4G，含 tokenizer，vllm 可直接加载）+ 逐层 sigma 日志。脚本自带 α=0 重构校验（相对误差需 <1e-3）。**不要用旧的 `replace.py` 跑多 α**：它的 state_dict 与模型参数共享存储，第一个 α 之后的输出全部被污染（详见脚本头部注释）。
+
+### 第 2 步：math 评测（POLARIS）
+
+```bash
+cd POLARIS
+bash scripts/eval/run_fig3_math.sh <GPU_ID> <MODEL_PATH> <OUT_DIR>
+# 例：bash scripts/eval/run_fig3_math.sh 0 ../sft_uv_blend/models/alpha_0.4 ./eval_out/alpha_0.4
+```
+
+固化参数：aime24/25 n=32、amc23 n=8、minerva/olympiad n=4；t=1.0, top_p=0.8, max_length=32768。结果（`Mean@n`）逐数据集追加在 `<OUT_DIR>/grade.txt`。脚本幂等（jsonl 存在跳过生成、grade.txt 有记录跳过打分），可随时断点续跑。多模型并行 = 多个进程各给一个 `GPU_ID`（eval_vllm.py 的 CVD bug 已在 `7c72038` 修复）。
+
+### 第 3 步：coding 评测（ArcherCodeR）
+
+```bash
+cd ArcherCodeR
+python tools/download_datasets.py        # 只需一次，下载 livecodebench_v5.json
+bash scripts/eval/run_fig3_lcb.sh <GPU_ID> <MODEL_PATH> <OUT_DIR>
+```
+
+固化参数：n=4, t=0.8, top_p=1.0, response 32k。生成 + 真实执行判题一体，结果写 `<OUT_DIR>/livecodebench_v5_out.parquet.pass.csv`（pass@1/pass@4）。**注意**：`data.path` 必须传 `.json`（该数据集嵌套列 >2GB，pandas 写出的 parquet 读不回来，JSON fallback 是正路）。
+
+### 第 4 步：汇总与画图
+
+```bash
+python sft_uv_blend/scripts/collect_results.py   # 8 模型 × 7 指标 TSV（改里面的 MODELS/路径）
+python sft_uv_blend/scripts/plot_alpha_sweep.py  # Figure-3 风格图（数据在脚本顶部 DATA 字典）
+```
+
+多机/多卡编排可参考 `sft_uv_blend/scripts/` 里的 `supervisor.sh`（按 GPU 自愈重启）与 `steal_loop.sh`（空卡 work-stealing），两者以"产物文件存在"为完成判据，天然幂等。
+
+### 已知坑（都踩过并有解）
+
+1. `replace.py` 多 α 污染 bug → 用 `blend_sft_uv.py`
+2. eval_vllm.py worker 覆盖 CVD → 已修（POLARIS `7c72038`）
+3. LCB parquet 嵌套 >2GB 读取失败 → 传 JSON；打分 fallback 需要 `polars`
+4. `setuptools>=81` 移除 pkg_resources → verl import 失败，锁 `<81`
+5. 通过 `kubectl exec` 启动长任务：一律用**脚本文件 + `setsid nohup`**；`pkill -f` 的模式若出现在自己命令行里会自杀（用 `pkill -f 'patter[n]'` bracket 技巧）
+6. 集群节点可能"Ready 但假死"（见上方事故记录）：长任务要有按产物文件判断的自愈/重跑机制，别信进程状态
