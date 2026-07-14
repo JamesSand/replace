@@ -56,4 +56,17 @@ $$\widetilde{W}(\alpha) = U_{\text{SFT}}\,\bigl(\alpha\,\Sigma_{\text{RL}} + (1-
 - 模型与日志：`~/workspace/rl-opt-proj/sft_uv_blend/{models,svd_logs,eval_outputs}/`
 - 运行编排：`sft_uv_blend/scripts/`（`supervisor.sh` 自愈重启 + `steal_loop.sh` / `boost_*.sh` 空卡 work-stealing + `collect_results.py` 汇总）
 - 评测补丁：`POLARIS/scripts/eval/eval_vllm.py` 已修复 worker 覆盖外部 `CUDA_VISIBLE_DEVICES` 的问题（多模型并行时会全部挤到 GPU 0）
-- 算力：k8s pods `zhizhousha-rlopt-fig3-8gpu`（8×H100）+ `zhizhousha-rlopt-fig3-5gpu-b`（5×H100，LCB/olympiad 加速）；节点 `research-common-h100-087` 在 07-13 23:19 UTC 出现过一次"Ready 但 exec 无响应、进程集体冻结"的故障，损失的 5 项已在 pod B 重跑（建议报 infra 排查）
+- 算力：k8s pods `zhizhousha-rlopt-fig3-8gpu`（8×H100）+ `zhizhousha-rlopt-fig3-5gpu-b`（5×H100，LCB/olympiad 加速）
+
+## 交付与清理（2026-07-14）
+
+**交付物**（本 repo，`hanq` 分支）：
+- `RESULTS_sft_uv_sigma_interp.md` —— 本文档（设置、协议、完整表格、结论、复现入口）
+- `alpha_sweep_sft_uv.png` —— Figure-3 风格 α 扫描图（空心圆 = SFT 原版，空心菱形 = RL 原版）
+- `blend_sft_uv.py` —— blend 脚本（含 replace.py 跨 α 污染 bug 的修复）
+
+**运行统计**：总计约 85 GPU·小时（13×H100 峰值并行）；每个 R1-Distill 系模型 math 全套 ~8-10h/卡（long-CoT 大量逼近 32k 上限），Nemotron 仅 ~4h —— RL 模型生成显著更短这一现象本身与论文结论自洽。
+
+**清理状态**：两个实验 pod 已删除；6 个 blend 模型（bf16, 各 3.4G）、全部生成 jsonl/parquet、逐层 sigma 日志保留在 `~/workspace/rl-opt-proj/sft_uv_blend/`，可随时复算或加密度补点（如 α∈{0.1,...,0.9} 或更多 RL checkpoint 对）。
+
+**⚠️ Infra 事故记录（建议上报）**：节点 `research-common-h100-087` 于 2026-07-13 23:19 UTC 发生"K8s 显示 Ready / 无污点标记，但 `kubectl exec` 无响应、节点上全部用户进程同时冻结"的故障，持续至少 2 小时未自愈；当时损失 4 个跑至 ~98% 的 olympiad 生成 + 1 个 LCB 打分阶段，已全部在 pod B 重跑补齐，数据无损失。
