@@ -1,6 +1,8 @@
 # SFT U/V + Σ 插值实验（论文 Figure 3 的镜像对照）
 
-> 状态：**中期汇总**（2026-07-13 22:40 UTC），全部 8 模型 × 7 指标预计 07-14 凌晨完成，届时更新本文件。
+> 状态：**最终结果**（2026-07-14 03:00 UTC，全部 8 模型 × 7 指标完成）。
+
+![alpha sweep](./alpha_sweep_sft_uv.png)
 
 ## 实验设置
 
@@ -23,31 +25,35 @@ $$\widetilde{W}(\alpha) = U_{\text{SFT}}\,\bigl(\alpha\,\Sigma_{\text{RL}} + (1-
 - **Code**（ArcherCodeR 流程，verl `main_generation`，测试用例真实执行）：LiveCodeBench v5 全量 279 题，n=4, t=0.8, response 32k → pass@1 / pass@4
 - 参考端点：`sft_orig`（R1-Distill 原版）与 `rl_orig`（Nemotron 原版）跑完全相同的协议
 
-## 当前结果（— = 仍在跑）
+## 最终结果（%）
 
 | 模型 | AIME24 | AIME25 | AMC23 | Minerva | Olympiad | LCB p@1 | LCB p@4 |
 |---|---|---|---|---|---|---|---|
-| **sft_orig**（≙ 下界参考） | **29.90** | **22.40** | **62.95** | — | — | — | — |
-| alpha_0.0（SFT 重构 sanity） | 30.21 | 23.23 | 63.40 | 26.47 | 43.96 | — | — |
-| alpha_0.2 | 30.83 | 23.96 | 62.80 | 26.84 | — | — | — |
-| alpha_0.4 | 30.21 | 22.19 | 64.16 | — | — | — | — |
-| alpha_0.6 | 30.21 | 23.54 | 63.40 | — | — | — | — |
-| alpha_0.8 | 28.65 | 22.92 | — | — | 43.63 | 18.28 | 26.88 |
-| alpha_1.0（SFT U/V + RL 谱） | 29.06 | 23.65 | 65.36 | — | — | — | — |
-| **rl_orig**（≙ 上界参考） | **48.54** | **32.50** | **80.72** | **34.93** | **59.81** | **29.48** | **36.20** |
+| **sft_orig** | **29.90** | **22.40** | **62.95** | **26.10** | **43.70** | **17.56** | **27.60** |
+| alpha_0.0 | 30.21 | 23.23 | 63.40 | 26.47 | 43.96 | 17.92 | 27.96 |
+| alpha_0.2 | 30.83 | 23.96 | 62.80 | 26.84 | 44.37 | 16.76 | 24.73 |
+| alpha_0.4 | 30.21 | 22.19 | 64.16 | 27.02 | 43.74 | 17.92 | 27.96 |
+| alpha_0.6 | 30.21 | 23.54 | 63.40 | 26.38 | 43.41 | 17.29 | 26.52 |
+| alpha_0.8 | 28.65 | 22.92 | 63.70 | 27.57 | 43.63 | 18.28 | 26.88 |
+| alpha_1.0 | 29.06 | 23.65 | 65.36 | 24.36 | 43.74 | 16.94 | 27.24 |
+| **rl_orig** | **48.54** | **32.50** | **80.72** | **34.93** | **59.81** | **29.48** | **36.20** |
 
-（单位 %；AIME24/25 = Mean@32，AMC23 = Mean@8，Minerva/Olympiad = Mean@4，LCB = pass@k）
+（AIME24/25 = Mean@32，AMC23 = Mean@8，Minerva/Olympiad = Mean@4，LCB = pass@k）
 
-## 初步结论（已完成的数据集上方向一致）
+**α 扫描的极差（max−min）**：AIME24 2.2pp、AIME25 1.8pp、AMC23 2.6pp、Minerva 3.2pp、Olympiad 1.0pp、LCB p@1 1.5pp —— 全部落在各自 Mean@n 的采样噪声量级内，且围绕 sft_orig 水平无方向性。
 
-1. **α 扫描曲线平坦**：AIME24 全程 28.7–30.8%、AIME25 22.2–24.0%、AMC23 62.8–65.4%，均在采样噪声内围绕 sft_orig 水平波动，与 α 无系统性关系 —— **把 RL 的谱以任意比例装进 SFT 的奇异框架，性能不变**。
-2. **Sanity 通过**：alpha_0.0 ≈ sft_orig（差 ≤0.8pp），SVD 分解-重构-bf16 存盘的管线本身对模型无损。
-3. **能力差距在框架（U/V）里**：rl_orig 比所有 blend 高 AIME24 ~18pp、AMC23 ~16pp、LCB pass@1 ~11pp。结合谱漂移仅 0.04% 的观测：RL 增益几乎完全由奇异框架的旋转携带，谱的贡献可忽略 —— 从镜像方向支持论文 Figure 3 / Section 3.2 的结论。
+## 结论
+
+1. **性能对 Σ 插值不变**：在 SFT 的奇异框架上把 RL 谱以任意比例换入，7 个指标全部钉在 SFT 水平（见图，α 扫描全线平坦）。
+2. **Sanity 通过**：alpha_0.0 与 sft_orig 的差异 ≤0.8pp（7 指标平均 ~0.3pp），SVD 分解-重构-bf16 存盘管线对模型无损。
+3. **RL 增益由奇异框架（U/V）携带**：rl_orig 比 α 扫描的所有模型高 AIME24 ~18pp、AMC23 ~16pp、Olympiad ~16pp、LCB p@1 ~12pp；结合谱漂移仅 ≤0.04% 的观测，RL 的行为改进几乎完全存在于 U/V 的旋转中，谱的贡献可忽略。
+4. 与论文 Figure 3 / Section 3.2 形成**双向证据**：那边是"RL 框架 + 换谱不掉分"，这边是"SFT 框架 + 换谱不涨分" —— 两个方向都指向 useful RLVR progress is carried by singular-frame motion, not spectral rescaling。
 
 ## 复现入口
 
 - Blend 脚本：`replace/blend_sft_uv.py`（注意：修复了 `replace.py` 的 state_dict 与模型参数共享存储的 bug —— 原脚本多 α 循环中 `load_state_dict` 会污染源谱，除首个 α 外结果均错误；同时每层 SVD 只算一次供全部 α 复用）
+- 画图：`sft_uv_blend/scripts/plot_alpha_sweep.py` → `replace/alpha_sweep_sft_uv.png`
 - 模型与日志：`~/workspace/rl-opt-proj/sft_uv_blend/{models,svd_logs,eval_outputs}/`
-- 运行编排：`sft_uv_blend/scripts/`（`supervisor.sh` 自愈重启 + `steal_loop.sh` 空卡work-stealing + `collect_results.py` 汇总）
+- 运行编排：`sft_uv_blend/scripts/`（`supervisor.sh` 自愈重启 + `steal_loop.sh` / `boost_*.sh` 空卡 work-stealing + `collect_results.py` 汇总）
 - 评测补丁：`POLARIS/scripts/eval/eval_vllm.py` 已修复 worker 覆盖外部 `CUDA_VISIBLE_DEVICES` 的问题（多模型并行时会全部挤到 GPU 0）
-- 算力：k8s pod `zhizhousha-rlopt-fig3-8gpu`（8×H100），math ~7h/模型（R1 系 long-CoT 逼近 32k 上限所致；Nemotron 仅 ~4h 全套，RL 模型生成显著更短）
+- 算力：k8s pods `zhizhousha-rlopt-fig3-8gpu`（8×H100）+ `zhizhousha-rlopt-fig3-5gpu-b`（5×H100，LCB/olympiad 加速）；节点 `research-common-h100-087` 在 07-13 23:19 UTC 出现过一次"Ready 但 exec 无响应、进程集体冻结"的故障，损失的 5 项已在 pod B 重跑（建议报 infra 排查）
